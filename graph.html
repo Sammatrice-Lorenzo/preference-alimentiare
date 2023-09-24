@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://unpkg.com/tailwindcss@^2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="assets/JQuery_3.5.1.js"></script>
+    <script src="assets/main.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        $(document).ready(async function () {
+            createGrahpFoodPreference()
+            createGrahpAllergies()
+            createGrahpNbMealForDay()
+        })
+    </script>
+
+    <title>Préférences Alimentaires</title>
+</head>
+<body>
+    <nav class="bg-gray-800 flex items-center justify-between flex-wrap bg-teal-500 p-6">
+        <div class="flex items-center flex-shrink-0 text-white mr-6">
+            <a href="./index.html">
+                <span class="font-semibold text-xl tracking-tight">Préférences Alimentaires</span>
+            </a>
+        </div>
+        <div class="w-full block flex-grow lg:flex lg:items-center lg:w-auto">
+            <div class="text-sm lg:flex-grow">
+                <a href="./graph.html" class="text-white text-2 block mt-4 lg:inline-block lg:mt-0 text-teal-200 hover:text-white mr-4">
+                    Graphiques
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="grid grid-cols-3">
+
+        <div class="h-96 py-4 mx-5 flex flex-col items-center justify-center">
+            <h2 class="text-2 mt-4 lg:mt-0 text-teal-200 hover:text-red text-center">
+                Graphique préférence alimentaire
+            </h2>
+            <canvas class='food-preference'></canvas>
+        </div>
+
+        <div class="h-96 py-4 flex flex-col items-center justify-center">
+            <h2 class="text-2 block mt-4 lg:inline-block lg:mt-0 text-teal-200 hover:text-red mr-4">
+                Graphique allergies
+            </h2>
+            <canvas class='allergies'></canvas>
+        </div>
+
+        <div class="h-96 py-4 flex flex-col items-center justify-center">
+            <h2 class="text-2 block mt-4 lg:inline-block lg:mt-0 text-teal-200 hover:text-red mr-4 text-center">
+                Nombre de repas par jours
+            </h2>
+            <canvas class='number-meal-day'></canvas>
+        </div>
+    </div>
+
+</body>
+</html>
