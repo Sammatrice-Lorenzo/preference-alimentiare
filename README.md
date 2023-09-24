@@ -5,4 +5,4 @@ Ce projet consiste afficher toutes les réponses du formulaire : https://docs.go
 Une page concerne l'affiche des réponses et une autre page concerne la mise en place des graphiques pour certaine réponse.
 
 
-Voici le lien pour accéder au site : https://sammatrice-lorenzo.github.io/preference-alimentiare/graph.html
+Voici le lien pour accéder au site : https://sammatrice-lorenzo.github.io/preference-alimentiare
