@@ -102,8 +102,9 @@ function setData(dataCsv) {
             + `<li>${dataCsv[key].numberOfMealForDay}</li>`
             + `<li>${dataCsv[key].consumptionOfFruitsAndVegetables}</li>`
 
+        const urlImg = dataCsv[key].img.replace('open?id=', 'uc?id=')
         let divImg = '<div class="bg-cyan-500 mx-5 end-0">'
-            + `<img class="object-contain h-48 w-40" src="${dataCsv[key].img}">`
+            + `<img class="object-contain h-48 w-40" src="${urlImg}">`
             + `</div>`
 
         ul.append(liData)
