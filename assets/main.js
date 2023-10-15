@@ -1,184 +1,118 @@
-const MEET = 'Viande'
-const FISH = 'Poisson'
-const VEGETARIAN = 'Végetarien'
-const HEADERS_FOOD_PREFERENCE = [MEET, FISH, VEGETARIAN]
-const MEAL_FOR_DAY = ['1 repas', '2 repas', '3 repas', '4 repas', '5 repas']
-
 async function getData () {
     const url = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRLb1B3Ya8dXHv4pELd03qKncWtLQnOxq1MGSzXgmCKPqZ80m6Os_VVDUnKcYege8YKE5RqlSsOiw7B/pub?output=csv'
-    let dataFood = []
+    try {
+        const response = await d3.csv(url);
 
-    await fetch(url, {
-        method: 'GET'
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Problème servuer !')
-        }
-        return response.text()
-    })
-    .then(csvData => {
-        const parsedData = parseCSV(csvData)
+        const parsedData = response.map(data => {
+            return {
+                'Nom': data['lastname'],
+                'Prénom': data['firstname'],
+                'Email': data['email'],
+                'Préférence alimentaire': data['foodPreference'],
+                'Allergies alimentaires': data['allergies'],
+                'Plat préféré': data['favoriteMeal'],
+                'Dessert préféré': data['favoriteDessert'],
+                'Boisson préféré': data['favoriteDrink'],
+                'Nombre de repas par jours': parseInt(data['numberOfMealForDay']),
+                'Consumation fruits et legumes': data['consumptionOfFruitsAndVegetables'],
+                'Image': data['img'].replace('open?id=', 'uc?id=')
+            };
+        });
 
-        for (const data of parsedData) {
-            dataFood.push(data)
-        }
-
-        return dataFood
-    })
-    .catch(error => console.error('Error:', error))
-
-    return dataFood.slice(1)
-}
-
-function parseCSV (csvData) {
-    const lines = csvData.split('\n')
-    const result = []
-    const headers = lines[0].split(',')
-
-    for (const line of lines) {
-        const dataCsv = {}
-        const currentLine = line.split(',')
-
-        for (const key in headers) {
-            dataCsv[headers[key].trim()] = currentLine[key]
-        }
-
-        result.push(dataCsv)
+        return parsedData;
+    } catch (error) {
+        console.error('Error:', error);
+        throw new Error('Problème serveur !');
     }
-
-    return result;
 }
 
 $(document).ready(async function () {
     const dataCsv = await getData()
 
-    setData(dataCsv)
+    buildDataInHtml(dataCsv)
+    d3.selectAll('.select').on('change', filters)
 })
-
-function setDivHeaders(idDiv) {
-    let div = `<div id=${idDiv} class="bg-gray-200 p-4 rounded shadow mb-4 row ${idDiv}">`
-        + '<div class="grid grid-cols-3">'
-            + '<div class="data-food">'
-                + '<ul>'
-                    + '<li><strong>Nom :</strong></li>'
-                    +  '<li><strong>Prénom:</strong></li>'
-                    +  '<li><strong>Email</strong></li>'
-                    +  '<li><strong>Préférence alimentaire: </strong></li>'
-                    +  '<li><strong>Allergies alimentaires: </strong></li>'
-                    +  '<li><strong>Plat préféré: </strong></li>'
-                    +  '<li><strong>Dessert préféré :</strong></li>'
-                    +  '<li><strong>Boisson préféré :</strong></li>'
-                    +  '<li><strong>Nombre de repas par jours: </strong></li>'
-                    +  '<li><strong>Consumation fruits et legumes </strong></li>'
-                + '</ul>'
-            + '</div>'
-        + '</div>'
-    + '</div>'
-
-    $('#data-csv').append(div)
-}
 
 /**
  * @param {Array} dataCsv 
  */
-function setData(dataCsv) {
+function buildDataInHtml(dataCsv) {
+    const divParent = d3.select('#data-csv');
 
-    for (const key in dataCsv) {
-        setDivHeaders(key)
-        let div = $('.' + key).children()
+    const allDiv = divParent.selectAll('.data-div')
+        .data(dataCsv)
+        .enter()
+        .append('div')
+        .attr('class', `bg-gray-200 p-4 rounded shadow mb-4 row`)
+        .attr('id', (d, index) => `${index}`)
+    
+    const lastDiv = allDiv.append('div').attr('class', 'grid grid-cols-3')
+    const divLeft = lastDiv.append('div').attr('class', 'data-food')
+    const divRight = lastDiv.append('div').attr('class', 'text-left')
 
-        div.append('<div class="text-left"><ul></ul></div>')
-        let ul = div.children('.text-left').children()
+    lastDiv.append('div')
+        .attr('class', 'bg-cyan-500 mx-5 end-0')
+        .append('img')
+        .attr('class', 'object-contain h-48 w-40')
 
-        let liData =  `<li> ${dataCsv[key].lastname}</li>`
-            + `<li>${dataCsv[key].firstname}</li>`
-            + `<li>${dataCsv[key].email}</li>`
-            + `<li>${dataCsv[key].foodPreference}</li>`
-            + `<li>${dataCsv[key].allergies}</li>`
-            + `<li>${dataCsv[key].favoriteMeal}</li>`
-            + `<li>${dataCsv[key].favoriteDessert}</li>`
-            + `<li>${dataCsv[key].favoriteDrink}</li>`
-            + `<li>${dataCsv[key].numberOfMealForDay}</li>`
-            + `<li>${dataCsv[key].consumptionOfFruitsAndVegetables}</li>`
+    setData(divLeft, 'head')
+    setData(divRight, 'value')
+}
 
-        const urlImg = dataCsv[key].img.replace('open?id=', 'uc?id=')
-        let divImg = '<div class="bg-cyan-500 mx-5 end-0">'
-            + `<img class="object-contain h-48 w-40" src="${urlImg}">`
-            + `</div>`
-
-        ul.append(liData)
-        div.append(divImg)
+function setHeaders(ul, head) {
+    const strong = ul.append('strong')
+    const li = strong.append('li')
+    if (head !== 'Image') {
+        li.text(`${head} :`)
     }
 }
 
-async function createChart(ctx, labels, data) {
+function setValuesUsers(ul, head, value, that) {
+    const li = ul.append('li')
+    if (head === 'Image') {
+        const divParent = d3.select(that).node().parentNode
+        const img = d3.select(divParent).select('img')
+        img.attr('src', value)
+    } else {
+        li.text(`${value}`)
+    }
+}
 
-    new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-            labels: labels,
-            datasets: [{
-                data: data
-            }],
-            hoverOffset: 4
+function setData(div, type) {
+    div.each(function (data) {
+        const ul = d3.select(this).append('ul')
+        Object.entries(data).forEach(([head, value]) => {
+            if (type === 'head') {
+                setHeaders(ul, head)
+            } else {
+                setValuesUsers(ul, head, value, this)
+            }
+        })
+    }) 
+}
+
+async function filters() {
+    let dataCsv = await getData()
+
+    let selects = d3.selectAll('.select-parent').selectAll('.select')
+    const filters = {
+        'select-allergies': 'Allergies alimentaires',
+        'select-food-preference': 'Préférence alimentaire',
+        'select-number-meal-day': 'Nombre de repas par jours'
+    }
+
+
+    let dataFiltered = dataCsv
+    for (const select of selects) {
+        let dataSelected = d3.select(select).property('value');
+        let idSelect = d3.select(select).property('id');
+        let key = filters[idSelect];
+    
+        if (dataSelected) {
+            dataFiltered = dataFiltered.filter(data => data[key] == dataSelected);
         }
-    })
-}
-
-async function createGrahpFoodPreference() {
-    const dataCsv = await getData()
-    const preferenceFood = dataCsv.map((data) => data.foodPreference)
-    
-    const ctx = $('.food-preference')
-
-    let meet = filteredDataFood(preferenceFood, MEET).length
-    let fish = filteredDataFood(preferenceFood, FISH).length
-    let vegetarian = filteredDataFood(preferenceFood, VEGETARIAN).length
-
-    let dataGraph = [meet, fish, vegetarian]
-
-    createChart(ctx, HEADERS_FOOD_PREFERENCE, dataGraph)
-}
-
-async function createGrahpAllergies() {
-    const dataCsv = await getData()
-    const allergies = dataCsv.map((data) => data.allergies)
-    
-    const ctx = $('.allergies')
-
-    let countAllergic = filteredDataFood(allergies, 'Oui').length
-    let countNotAllergic = filteredDataFood(allergies, 'Non').length
-
-    let dataGraph = [countAllergic, countNotAllergic]
-
-    createChart(ctx, ['Oui', 'Non'], dataGraph)
-}
-
-async function createGrahpNbMealForDay() {
-    const dataCsv = await getData()
-    const nbMealForDay = dataCsv.map((data) => data.numberOfMealForDay)
-
-    const ctx = $('.number-meal-day')
-
-    let oneMealForDay = filteredDataFood(nbMealForDay, '1').length
-    let twoMealForDay = filteredDataFood(nbMealForDay, '2').length
-    let threeMealForDay = filteredDataFood(nbMealForDay, '3').length
-    let fourMealForDay = filteredDataFood(nbMealForDay, '4').length
-    let fiveMealForDay = filteredDataFood(nbMealForDay, '5').length
-
-    let dataGraph = [oneMealForDay, twoMealForDay, threeMealForDay, fourMealForDay, fiveMealForDay]
-
-    createChart(ctx, MEAL_FOR_DAY, dataGraph)
-}
-
-
-/**
- * 
- * @param {Array} dataFood 
- * @param {string} typeOfData 
- * @returns 
- */
-function filteredDataFood(dataFood, typeOfData) {
-    return dataFood.filter((data) => data === typeOfData)
+    }
+  
+    d3.select('#data-csv').html('')
+    buildDataInHtml(dataFiltered ?? dataCsv)
 }

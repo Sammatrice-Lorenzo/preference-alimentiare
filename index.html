@@ -7,6 +7,7 @@
     <script src="assets/JQuery_3.5.1.js"></script>
     <script src="assets/main.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
 
     <title>Préférences Alimentaires</title>
 </head>
@@ -29,7 +30,43 @@
 
     <div class="container mx-auto py-8">
         <h1 class="text-2xl font-bold mb-4">Préférences Alimentaires</h1>
-        <div id='data-csv' class="grid grid-cols-2 gap-4"></div>
+        <div class="row grid grid-cols-3">
+            <div class="mx-2 select-parent">
+                <select id="select-allergies" class="select bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500
+                    focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400
+                    dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                >
+                    <option selected value="">Filtrer par les personnes allergiques</option>
+                    <option value="Oui">Allergiques</option>
+                    <option value="Non">Pas allergiques</option>
+                </select>
+            </div>
+            <div class="mx-2 select-parent">
+                <select id="select-food-preference" class="select bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500
+                    focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400
+                    dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                >
+                    <option selected value="">Filtrer par préférence alimentaire</option>
+                    <option value="Viande">Viande</option>
+                    <option value="Poisson">Poisson</option>
+                    <option value="Végétarien">Végétarien</option>
+                </select>
+            </div>
+            <div class="mx-2 select-parent">
+                <select id="select-number-meal-day" class="select bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500
+                    focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400
+                    dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                >
+                    <option selected value="">Filterer par nombre de repas par jours</option>
+                    <option value=1>1</option>
+                    <option value=2>2</option>
+                    <option value=3>3</option>
+                    <option value=4>4</option>
+                    <option value=5>5</option>
+                </select>
+            </div>
+        </div>
+        <div id='data-csv' class="grid grid-cols-2 gap-4 mt-5"></div>
     </div>
 
 </body>
